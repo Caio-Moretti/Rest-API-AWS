@@ -1,18 +1,18 @@
 import boto3
-
+#
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('product-inventory')
 
-# response = table.get_item(
-#     Key={
-#         'productId': productId
-#     }
-# )
-#
-# if 'Items' in response:
-#     print(response['Items'])
-# else:
-#     print(response)
+response = table.get_item(
+    Key={
+        'productId': "3"
+    }
+)
+
+if 'Items' in response:
+    print(response['Items'])
+else:
+    print(response)
 
 
 table.put_item(
@@ -22,21 +22,21 @@ table.put_item(
         'Name': 'teste2'
     }
 )
-print('done')
+# print('done')
 
 
-# table = dynamodb.Table('todos')
+table = dynamodb.Table('todos')
 
 
-# response = table.get_item(
-#     Key={
-#         'todo_id': '1',
-#     }
-# )
-# item = response['Item']
-# print(item)
-# print()
-# print(response)
+response = table.get_item(
+    Key={
+        'todo_id': '1',
+    }
+)
+item = response['Item']
+print(item)
+print()
+print(response)
 
 # table = dynamodb.create_table(
 #     TableName='todos',

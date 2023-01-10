@@ -9,24 +9,25 @@ dynamodb_table_name = 'product-inventory'
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(dynamodb_table_name)
 
-getMethod = 'GET'  # esse é o método get
+getMethod = 'GET'
 postMethod = 'POST'
 patchMethod = 'PATCH'
 deleteMethod = 'DELETE'
 healthPath = '/health'
-productPath = '/product'  # get + esse path = get product by id
+productPath = '/product'
 productsPath = '/products'
-
 
 def lambda_handler(event, context):
     logger.info(event)
     httpMethod = event['httpMethod']
     path = event['path']
+
     if httpMethod == getMethod and path == healthPath:
         response = buildResponse(200)
 
     elif httpMethod == getMethod and path == productPath:
-        response = getProduct(event['queryStringParameters']['productId'])  # erro é nessa linha provavelmente.
+        requestBody = json.loads(event['body'])
+        response = getProduct(requestBody['productId'])
 
     elif httpMethod == getMethod and path == productsPath:
         response = getProducts()
@@ -35,11 +36,11 @@ def lambda_handler(event, context):
         response = saveProduct(json.loads(event['body']))
 
     elif httpMethod == patchMethod and path == productPath:
-        requestBody = json.loads(event['body'])  # talvez esteja dando erro aqui também
-        response = modifyProduct(requestBody['productId'], requestBody['updateKey'], requestBody['updateValue'])  # ou aqui
+        requestBody = json.loads(event['body'])
+        response = modifyProduct(requestBody['productId'], requestBody['updateKey'], requestBody['updateValue'])
 
     elif httpMethod == deleteMethod and path == productPath:
-        requestBody = json.loads(event['body'])  # mas teria que dar erro aqui também então provavelmente não é
+        requestBody = json.loads(event['body'])
         response = deleteProduct(requestBody['productId'])
 
     else:
@@ -63,8 +64,8 @@ def getProduct(productId):
                 'productId': productId
             }
         )
-        if 'Items' in response:
-            return buildResponse(200, response['Items'])  # ou nessa
+        if 'Item' in response:
+            return buildResponse(200, response['Item'])
         else:
             return buildResponse(404, {'Message': f'productId: {productId} not found'})
     except:
@@ -74,6 +75,7 @@ def getProduct(productId):
 def getProducts():
     try:
         response = table.scan()
+        print(response)
         result = response['Items']
 
         while 'LastEvaluatedKey' in response:
@@ -101,7 +103,7 @@ def saveProduct(requestBody):
         return buildResponse(200, body)
 
     except:
-        logger.exception('Error')
+        logger.exception('Error at saveProduct function')
 
 
 def modifyProduct(productId, updateKey, updateValue):
@@ -146,14 +148,13 @@ def deleteProduct(productId):
 
 def buildResponse(statusCode, body=None):
     response = {
-        'statusCode': statusCode,
+        'statusCode': statusCode,  # o Problema do get by ID provavelmente está na cosntrução do response nessa função
         'headers': {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         }
     }
+    print(body)
     if body is not None:
         response['body'] = json.dumps(body, cls=CustomEncoder)
     return response
-
-
