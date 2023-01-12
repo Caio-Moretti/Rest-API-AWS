@@ -13,9 +13,11 @@ getMethod = 'GET'
 postMethod = 'POST'
 patchMethod = 'PATCH'
 deleteMethod = 'DELETE'
+
 healthPath = '/health'
 productPath = '/product'
 productsPath = '/products'
+
 
 def lambda_handler(event, context):
     logger.info(event)
@@ -75,7 +77,6 @@ def getProduct(productId):
 def getProducts():
     try:
         response = table.scan()
-        print(response)
         result = response['Items']
 
         while 'LastEvaluatedKey' in response:
