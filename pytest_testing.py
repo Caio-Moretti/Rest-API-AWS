@@ -1,7 +1,7 @@
 import json
 import os
-import pytest
-import requests
+# import pytest
+# import requests
 
 with open(os.path.join("terraform", "terraform.tfstate"), "r") as file:
     tfstate_json = json.loads(file.read())

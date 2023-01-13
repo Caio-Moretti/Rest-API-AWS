@@ -16,7 +16,6 @@ resource "aws_api_gateway_resource" "health" {
   rest_api_id = aws_api_gateway_rest_api.this.id
 }
 
-
 resource "aws_api_gateway_method" "get_health" {
   authorization    = "NONE"
   http_method      = "GET"
