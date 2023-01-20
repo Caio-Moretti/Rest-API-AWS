@@ -142,14 +142,14 @@ def deleteProduct(productId):
             'Message': 'SUCCESS',
             'deletedItem': response
         }
-        return buildResponse(200, body)
+        return buildResponse(200, body)  # TODO create an if statement for when the productId is not at the items
     except:
         logger.exception('Error')
 
 
 def buildResponse(statusCode, body=None):
     response = {
-        'statusCode': statusCode,  # o Problema do get by ID provavelmente está na cosntrução do response nessa função
+        'statusCode': statusCode,
         'headers': {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
