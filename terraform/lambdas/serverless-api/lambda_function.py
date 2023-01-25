@@ -95,54 +95,86 @@ def getProducts():
 
 def saveProduct(requestBody):
     try:
-        table.put_item(Item=requestBody)  # não cria o 'Items'
-        body = {
-            'Operation': 'SAVE',
-            'Message': 'SUCCESS',
-            'Item': requestBody
-        }
-        return buildResponse(200, body)
+        # get item with productId
+        response = table.get_item(
+            Key={
+                'productId': requestBody["productId"]
+            }
+        )
+        # checks if the ID already exists
+        if 'Item' in response:
+            return buildResponse(409, {'Message': f'productId: {requestBody["productId"]} already exists'})
 
+        # creates if it doesn't exist
+        else:
+            table.put_item(Item=requestBody)
+            body = {
+                'Operation': 'SAVE',
+                'Message': 'SUCCESS',
+                'Item': requestBody
+            }
+            return buildResponse(201, body)
     except:
         logger.exception('Error at saveProduct function')
 
 
 def modifyProduct(productId, updateKey, updateValue):
     try:
-        response = table.update_item(
+        # get item with productId
+        response_get = table.get_item(
             Key={
                 'productId': productId
-            },
-            UpdateExpression=f'set {updateKey} = :value',
-            ExpressionAttributeValues={
-                ':value': updateValue
-            },
-            ReturnValues='UPDATED_NEW'
+            }
         )
-        body = {
-            'Operation': 'UPDATE',
-            'Message': 'SUCCESS',
-            'UpdatedAttributes': response
-        }
-        return buildResponse(200, body)
+
+        # checks if the productId exists
+        if 'Item' in response_get:
+            response_update = table.update_item(
+                Key={
+                    'productId': productId
+                },
+                UpdateExpression=f'set {updateKey} = :value',
+                ExpressionAttributeValues={
+                    ':value': updateValue
+                },
+                ReturnValues='UPDATED_NEW'
+            )
+            body = {
+                'Operation': 'UPDATE',
+                'Message': 'SUCCESS',
+                'UpdatedAttributes': response_update
+            }
+            return buildResponse(200, body)
+
+        # 404 if it doesn't exist
+        else:
+            return buildResponse(404, {'Message': f'productId: {productId} not found'})
     except:
         logger.exception('Error')
 
 
 def deleteProduct(productId):
     try:
-        response = table.delete_item(
+        response_get = table.get_item(
             Key={
                 'productId': productId
-            },
-            ReturnValues='ALL_OLD'
+            }
         )
-        body = {
-            'Operation': 'DELETE',
-            'Message': 'SUCCESS',
-            'deletedItem': response
-        }
-        return buildResponse(200, body)  # TODO create an if statement for when the productId is not at the items
+        if 'Item' in response_get:
+            response_delete = table.delete_item(
+                Key={
+                    'productId': productId
+                },
+                ReturnValues='ALL_OLD'
+            )
+            body = {
+                'Operation': 'DELETE',
+                'Message': 'SUCCESS',
+                'deletedItem': response_delete
+            }
+            return buildResponse(200, body)
+        else:
+            return buildResponse(404, {'Message': f'productId: {productId} not found'})
     except:
         logger.exception('Error')
 

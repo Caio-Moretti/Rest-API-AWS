@@ -1,6 +1,3 @@
-# TODO criar mensagens personalizadas para as famílias de status code
-#  dos erros da API pra melhorar os testes
-
 import json
 import os
 import uuid
@@ -15,36 +12,40 @@ endpoint = f"{tfstate_json['outputs']['api_url']['value']}prod"
 print(f" API URL: {endpoint}")
 
 
-def test_can_call_endponint():
+def test_01_verify_endpoint_health():
+    # enter the /health path and get the 200 OK status code
     response = requests.get(f"{endpoint}/health")
     assert response.status_code == 200
 
 
-def test_can_create_product():
+def test_02_verify_product_creation():
     # post product
     post_product_payload = new_product_paylaod()
     post_product_response = create_product(post_product_payload)
-    assert post_product_response.status_code == 200
+    assert post_product_response.status_code == 201
 
     post_product_data = post_product_response.json()
     product_id = post_product_data['Item']['productId']
     product_id_payload = {
         "productId": product_id
     }
+
+    # get and validate the creation
     get_product_response = get_product(product_id_payload)
     assert get_product_response.status_code == 200
     get_product_data = get_product_response.json()
     assert get_product_data['productId'] == post_product_payload["productId"]
     assert get_product_data['productName'] == post_product_payload['productName']
 
+    # delete product created
     delete_product(product_id_payload)
 
 
-def test_can_update_product():
+def test_03_verify_product_update():
     # create a product
     post_product_payload = new_product_paylaod()
     post_product_response = create_product(post_product_payload)
-    assert post_product_response.status_code == 200
+    assert post_product_response.status_code == 201
 
     # update the produtct created
     update_payload = {
@@ -68,18 +69,19 @@ def test_can_update_product():
     assert get_product_data["productId"] == update_payload["productId"]
     assert get_product_data["productName"] == update_payload["updateValue"]
 
+    # delete product created
     delete_product(product_id_payload)
 
 
-def test_can_list_products():
-    # create N tasks.
+def test_04_verify_products_list():
+    # create N products.
     n = 3
     for _ in range(n):
         post_product_payload = new_product_paylaod()
         post_product_response = create_product(post_product_payload)
-        assert post_product_response.status_code == 200
+        assert post_product_response.status_code == 201
 
-    # list tasks and check that there are N items
+    # list products and check that there are N items
     get_products_response = get_products()
     assert get_products_response.status_code == 200
     get_products_data = get_products_response.json()
@@ -87,6 +89,7 @@ def test_can_list_products():
     products = get_products_data['products']
     assert len(products) == n
 
+    # delete products
     for lits_item in products:
         for key, value in lits_item.items():
             if key == 'productId':
@@ -98,11 +101,11 @@ def test_can_list_products():
                 pass
 
 
-def test_can_delete_product():
+def test_05_verify_product_deletion():
     # post product
     post_product_payload = new_product_paylaod()
     post_product_response = create_product(post_product_payload)
-    assert post_product_response.status_code == 200
+    assert post_product_response.status_code == 201
 
     post_product_data = post_product_response.json()
     product_id = post_product_data['Item']['productId']
@@ -115,12 +118,13 @@ def test_can_delete_product():
     delete_product_response = delete_product(product_id_payload)
     assert delete_product_response.status_code == 200
 
-    # get the product and check that it's not found.
-    get_product_response = get_product(product_id)
-    assert get_product_response.status_code != 200
+    # get the product and check that is not found.
+    get_product_response = get_product(product_id_payload)
+    assert get_product_response.status_code == 404
 
 
 def create_product(payload):
+    # return requests.post(f"{endpoint}/product/#allproducts", json=payload)
     return requests.post(f"{endpoint}/product", json=payload)
 
 
