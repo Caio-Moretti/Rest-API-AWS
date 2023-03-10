@@ -8,6 +8,7 @@ Serverless Rest API created at AWS using Terraform
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/caio-moretti/Rest-API-AWS)
 ![GitHub](https://img.shields.io/github/license/Caio-Moretti/Rest-API-AWS)
 ![GitHub top language](https://img.shields.io/github/languages/top/caio-moretti/Rest-API-AWS)
+![GitHub language count](https://img.shields.io/github/languages/count/caio-moretti/rest-api-aws)
 # Description
 
 This project was created by Caio Moretti for the AsCan Academy "AWS Iniciante" trail from Instituto Atlântico.
