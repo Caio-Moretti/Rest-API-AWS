@@ -52,7 +52,7 @@ Here is a sample TOC(*wow! such cool!*) that is actually the TOC for this README
 
 To use this project, first clone the repo on your device using the command below:
  ```bash
- git clone https://github.com/navendu-pottekkat/nsfw-filter.git
+ git clone https://github.com/Caio-Moretti/Rest-API-AWS.git
  ```
 After that, you wil need to configure the **AWS** Configuration using AWS CLI from the account created.
 ```
