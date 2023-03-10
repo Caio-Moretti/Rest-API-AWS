@@ -33,12 +33,13 @@ Here is a sample TOC(*wow! such cool!*) that is actually the TOC for this README
 - [Project Title](#serverless-rest-api)
 - [Description](#description)
 - [Table of contents](#table-of-contents)
+- [Required Tools](#required-tools)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Development](#development)
 - [License](#license)
 
-# Necessary tools
+# Required Tools
 [(Back to top)](#table-of-contents)
 
 > There are some tools you will need to run the project correctely:
