@@ -12,7 +12,7 @@ endpoint = f"{tfstate_json['outputs']['api_url']['value']}prod"
 
 
 @pytest.fixture()
-def products(request):
+def setup_teardown(request):
     # saves the product ids passed
     product_ids = []
 
@@ -55,19 +55,19 @@ def test_01_verify_endpoint_health():
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("products", [{"n": 2}], indirect=True)
-def test_02_verify_product_creation(products):
+@pytest.mark.parametrize("setup_teardown", [{"n": 2}], indirect=True)
+def test_02_verify_product_creation(setup_teardown):
     # gets product ids passed in payload and products list
-    products_list, product_ids = products
+    products_list, product_ids = setup_teardown
 
     # checks if products list ids equals product ids from payload
     assert set(product_ids) == set(product['productId'] for product in products_list)
 
 
-@pytest.mark.parametrize("products", [{"n": 1}], indirect=True)
-def test_03_verify_product_update(products):
+@pytest.mark.parametrize("setup_teardown", [{"n": 1}], indirect=True)
+def test_03_verify_product_update(setup_teardown):
     # gets product ids passed in payload and products list
-    products_list, product_ids = products
+    products_list, product_ids = setup_teardown
 
     # updates the created product and checks if it's really changed
     update_payload = {
@@ -82,17 +82,18 @@ def test_03_verify_product_update(products):
     assert products_updated[0]["productName"] == "changed" != products_list[0]["productName"]
 
 
-@pytest.mark.parametrize("products", [{"n": 3}], indirect=True)
-def test_04_verify_products_list(products):
+@pytest.mark.parametrize("setup_teardown", [{"n": 3}], indirect=True)
+def test_04_verify_products_list(setup_teardown):
     # checks if the list size equals the number of products passed as parameter to create
-    assert len(products[0]) == 3
+    assert len(setup_teardown[0]) == 3
 
 
-@pytest.mark.parametrize("products", [{"n": 1}], indirect=True)
-def test_05_verify_product_deletion(products):
+# noinspection PyTypeChecker
+@pytest.mark.parametrize("setup_teardown", [{"n": 1}], indirect=True)
+def test_05_verify_product_deletion(setup_teardown):
     # deletes product created and checks if the product was deleted
-    response_deletion = requests.delete(f"{endpoint}/product", json={"productId": products[0][0]["productId"]})
+    response_deletion = requests.delete(f"{endpoint}/product", json={"productId": setup_teardown[0][0]["productId"]})
     assert response_deletion.status_code == 200
 
-    response = requests.get(f"{endpoint}/product", json={"productId": products[0][0]["productId"]})
+    response = requests.get(f"{endpoint}/product", json={"productId": setup_teardown[0][0]["productId"]})
     assert response.status_code == 404
