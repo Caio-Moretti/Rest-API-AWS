@@ -62,7 +62,7 @@ You will need to configure your AWS Account:
 ```
 AWS Access Key ID [****]:
 AWS Secret Access Key [****]:
-Default region name [us-west-1]: us-west-2
+Default region name [us-west-1]:
 Default output format [None]:
 ```
 
