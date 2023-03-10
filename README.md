@@ -119,4 +119,4 @@ I personally add the name of the license and provide a link to it like below. --
 > [MIT License](LICENSE)
 ---
 
-# _Thank You!_
+![](img/thank you footer.png)
